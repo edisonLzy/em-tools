@@ -1,6 +1,5 @@
 node_modules
-es
-lib
 types
 *.local.*
 coverage
+dist
