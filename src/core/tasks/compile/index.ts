@@ -4,7 +4,7 @@ import buildTsx from '../tsx';
 import { getProjectPath } from '../../utils';
 
 const sourceGlob = {
-  styles: ['components/**/*.less'],
+  styles: 'components/**/style/*.less',
 };
 
 const libDir = getProjectPath('lib');
@@ -14,7 +14,7 @@ export default function compile(target: 'es' | 'lib') {
   const outDir = target === 'es' ? esDir : libDir;
   return gulp.parallel(
     buildLess({
-      sourceDir: sourceGlob['styles'],
+      sourceDir: getProjectPath(sourceGlob.styles),
       outDir: outDir,
     }),
     buildTsx()

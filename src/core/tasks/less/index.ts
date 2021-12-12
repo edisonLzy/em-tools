@@ -8,6 +8,8 @@ interface Options {
 }
 export default function ({ sourceDir = '', outDir = '' }: Partial<Options>) {
   return () => {
+    console.log(sourceDir);
+
     return gulp
       .src(sourceDir)
       .pipe(
