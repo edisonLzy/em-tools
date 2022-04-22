@@ -5,6 +5,7 @@ const pkg = require('../package.json');
 
 program
   .version(pkg.version)
+  .allowUnknownOption()
   .command('run [name]', 'run specified task', {
     executableFile: path.resolve(__dirname, './core/index.js'),
   })

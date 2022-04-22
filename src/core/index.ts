@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import gulp from 'gulp';
 import { program } from 'commander';
+import { loadTasks } from './utils/loadTasks';
+import { resolveCore } from './utils';
 export interface MetaData {
   task: string;
   hrDuration: ReturnType<typeof process.hrtime>;
 }
-function runTask(taskName: string) {
+function runTask(taskName: string, rest: string[] = []) {
   const metadata: MetaData = { task: taskName, hrDuration: [0, 0] };
   // 只 转入名称会返回 注册的函数
   const taskInstance = gulp.task(taskName);
@@ -16,7 +18,7 @@ function runTask(taskName: string) {
   const start = process.hrtime();
   gulp.emit('task_start', metadata);
   try {
-    Reflect.apply(taskInstance, gulp, []);
+    Reflect.apply(taskInstance, gulp, rest);
     metadata.hrDuration = process.hrtime(start);
     gulp.emit('task_stop', metadata);
     gulp.emit('stop');
@@ -33,15 +35,24 @@ async function main() {
     console.log();
   });
 
-  program.parse(process.argv);
+  program.allowUnknownOption().parse(process.argv);
 
-  const task = program.args[0];
+  const [task, ...rest] = program.args;
+
   if (!task) {
     program.help();
   } else {
-    console.log('em-tools run', task);
+    await loadTasks({
+      cwd: resolveCore('tasks'),
+    });
+
+    await loadTasks({
+      cwd: resolveCore('jobs'),
+    });
+
     await import('./gulpfile');
-    await runTask(task);
+
+    await runTask(task, rest);
   }
 }
 main();
